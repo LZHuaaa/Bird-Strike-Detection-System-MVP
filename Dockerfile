@@ -4,7 +4,15 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies (required for some Python packages like librosa/scipy)
+# Allow both package imports and old local-style imports
+# Supports:
+# - from backend.xxx import ...
+# - from db import ...
+# - from utils.xxx import ...
+ENV PYTHONPATH="/app:/app/backend"
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies required by audio / ML packages
 RUN apt-get update && apt-get install -y \
     libsndfile1 \
     ffmpeg \
@@ -14,7 +22,8 @@ RUN apt-get update && apt-get install -y \
 COPY requirements-deploy.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements-deploy.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements-deploy.txt
 
 # Copy the entire backend code
 COPY backend/ ./backend/
@@ -22,5 +31,5 @@ COPY backend/ ./backend/
 # Expose the port Hugging Face expects
 EXPOSE 7860
 
-# Command to run the FastAPI app on the Hugging Face expected port
+# Run the FastAPI app on the Hugging Face expected port
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "7860"]
