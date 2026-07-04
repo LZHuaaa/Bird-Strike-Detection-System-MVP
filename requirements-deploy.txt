@@ -1,16 +1,17 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 
-# Core ML (Slimmed)
+# Core ML
 torch==2.7.1
 torchaudio==2.7.1
 torchvision==0.22.1
-tflite-runtime
+tflite-runtime==2.14.0
 transformers==4.53.2
 scikit-learn==1.7.0
 scipy==1.16.0
 numpy==1.26.4
 librosa==0.10.1
 birdnetlib==0.13.0
+tensorflow-cpu==2.15.0
 
 # API & Web
 fastapi==0.104.1
@@ -22,6 +23,7 @@ requests==2.32.4
 
 # Database
 SQLAlchemy==2.0.41
+psycopg2-binary==2.9.12
 
 # GenAI
 google-generativeai==0.8.5
