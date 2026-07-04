@@ -11,6 +11,7 @@ scipy==1.16.0
 numpy==1.26.4
 librosa==0.10.1
 birdnetlib==0.13.0
+tensorflow-cpu==2.15.0
 
 # API & Web
 fastapi==0.104.1
