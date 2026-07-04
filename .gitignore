@@ -47,3 +47,4 @@ lerna-debug.log*
 *.env
 !*.env.example
 !**/.env.example
+bird-strike-api/
