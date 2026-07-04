@@ -3,6 +3,10 @@
 bird_strike_env/
 *.pyc
 __pycache__/
+.venv/
+.venv-deploy/
+venv/
+
 
 
 # Database
