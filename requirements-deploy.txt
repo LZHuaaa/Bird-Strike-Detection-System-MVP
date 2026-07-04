@@ -1,0 +1,38 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Core ML (Slimmed)
+torch==2.7.1
+torchaudio==2.7.1
+torchvision==0.22.1
+tflite-runtime
+transformers==4.53.2
+scikit-learn==1.7.0
+scipy==1.16.0
+numpy==1.26.4
+librosa==0.10.1
+birdnetlib==0.13.0
+
+# API & Web
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+websockets==12.0
+python-dotenv==1.0.1
+requests==2.32.4
+
+# Database
+SQLAlchemy==2.0.41
+
+# GenAI
+google-generativeai==0.8.5
+openai==1.95.1
+
+# Utility
+python-dateutil==2.9.0.post0
+python-json-logger==2.0.7
+PyYAML==6.0.2
+pillow==11.3.0
+soundfile==0.12.1
+pydub==0.25.1
+pydantic==2.11.7
+pydantic_core==2.33.2
