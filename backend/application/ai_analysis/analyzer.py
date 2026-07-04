@@ -37,7 +37,7 @@ except ImportError:
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-from db import BirdSpecies,BirdImageService
+from backend.db import BirdSpecies,BirdImageService
 import pickle
 import warnings
 import uuid
