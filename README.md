@@ -1,3 +1,12 @@
+---
+title: Bird Strike API
+emoji: 🐦
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
 
 # 🐦 Avian Intel Bridge - Bird Strike Detection System MVP
 
