@@ -20,8 +20,8 @@ engine = create_engine(
     DATABASE_URL,
     echo=False,
     connect_args=connect_args,
-    pool_size=20,
-    max_overflow=30,
+    pool_size=2,
+    max_overflow=3,
     pool_pre_ping=True,
     pool_recycle=300,
 )

@@ -34,7 +34,10 @@ async def db_session_middleware(request: Request, call_next):
         response = await call_next(request)
         return response
     finally:
-        db_session.remove()
+        try:
+            db_session.remove()
+        except Exception as e:
+            print(f"Error during db_session.remove(): {e}")
 
 # Include all endpoint routers
 app.include_router(alerts.router)
