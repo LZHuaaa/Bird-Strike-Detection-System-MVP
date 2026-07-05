@@ -33,6 +33,11 @@ def seed_risk_data_sqlalchemy():
     """Seed database with sample risk assessment data using SQLAlchemy"""
     session = SessionLocal()
     try:
+        # Idempotency check
+        if session.query(RunwayRiskAssessment).first():
+            print("✅ Risk assessment data already exists. Skipping.")
+            return
+
         runways = session.query(Runway).all()
         if not runways:
             print("❌ No runways found in database")
@@ -235,6 +240,73 @@ def init_risk_data_sqlite():
     finally:
         conn.close()
 
+def seed_test_alerts_sqlalchemy():
+    """Add some test alerts to the database using SQLAlchemy"""
+    session = SessionLocal()
+    try:
+        # Idempotency check
+        if session.query(BirdAlert).count() > 0:
+            print("✅ Test alerts already exist. Skipping.")
+            return
+
+        runways = session.query(Runway).all()
+        if not runways:
+            runway = Runway(runway_name='09L/27R', airport_code='TEST', length=3000, width=45, orientation=90, is_active=True)
+            session.add(runway)
+            session.commit()
+            runways = [runway]
+
+        alert_levels = ['LOW', 'MEDIUM', 'HIGH']
+        actions = [
+            'Monitor bird activity near runway',
+            'Consider temporary runway closure',
+            'Alert ground crew for inspection',
+            'Increase monitoring frequency',
+            'Deploy deterrent measures'
+        ]
+        
+        species_list = session.query(BirdSpecies).all()
+        if not species_list:
+            print("❌ No bird species found in database. Cannot seed alerts.")
+            return
+
+        for i in range(5):
+            timestamp = datetime.utcnow() - timedelta(hours=random.randint(0, 23))
+            runway = random.choice(runways)
+            species = random.choice(species_list)
+            
+            detection = BirdDetection(
+                species_id=species.id,
+                timestamp=timestamp,
+                confidence=random.uniform(0.7, 0.95),
+                distance_from_runway=random.uniform(100, 1000),
+                direction=random.choice(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'])
+            )
+            session.add(detection)
+            session.flush()
+            
+            alert = BirdAlert(
+                detection_id=detection.id,
+                species_id=species.id,
+                timestamp=timestamp,
+                alert_level=random.choice(alert_levels),
+                risk_score=random.uniform(20, 80),
+                recommended_action=random.choice(actions),
+                proximity_to_runway=random.uniform(100, 1000),
+                flight_path_intersection=random.choice([False, True]),
+                flock_size=random.randint(1, 10),
+                resolved=False
+            )
+            session.add(alert)
+            
+        session.commit()
+        print("✅ Test alerts added successfully (SQLAlchemy)")
+    except Exception as e:
+        print(f"❌ Error seeding alerts: {str(e)}")
+        session.rollback()
+    finally:
+        session.close()
+
 def seed_test_alerts_sqlite():
     """Add some test alerts to the database using SQLite3"""
     conn = sqlite3.connect('bird_strike_detection.db')
@@ -316,7 +388,18 @@ def seed_demo_detections():
     session = SessionLocal()
     try:
         # First, check if demo birds already exist (avoid duplicates)
-        demo_species_names = ["House Crow", "White-bellied Sea-Eagle", "Common Myna"]
+        demo_species_names = ["House Crow", "Red-tailed Hawk", "European Starling"]
+        
+        # Check if we already seeded today's demo detections
+        cutoff_time = datetime.utcnow() - timedelta(hours=1)
+        recent_demos = session.query(BirdDetection).join(BirdSpecies).filter(
+            BirdSpecies.common_name.in_(demo_species_names),
+            BirdDetection.timestamp > cutoff_time
+        ).count()
+
+        if recent_demos >= len(demo_species_names):
+            print("✅ Demo detections already exist and are recent. Skipping.")
+            return
         
         # Clear old demo detections (optional - you can keep this or remove)
         # This ensures we always have fresh demo data
@@ -355,7 +438,7 @@ def seed_demo_detections():
                 "timestamp_offset": 0  # Current time
             },
             {
-                "species_name": "White-bellied Sea-Eagle",
+                "species_name": "Red-tailed Hawk",
                 "confidence": 0.92,
                 "location_x": 30.0,
                 "location_y": 220.0,
@@ -367,7 +450,7 @@ def seed_demo_detections():
                 "timestamp_offset": 5  # 5 minutes ago
             },
             {
-                "species_name": "Common Myna",
+                "species_name": "European Starling",
                 "confidence": 0.87,
                 "location_x": 160.0,
                 "location_y": 120.0,
@@ -448,10 +531,11 @@ def main():
     if args.all or (not args.risk and not args.init and not args.alerts and not args.demo):
         if SQLALCHEMY_AVAILABLE:
             seed_risk_data_sqlalchemy()
+            seed_test_alerts_sqlalchemy()
+            seed_demo_detections()
         else:
             init_risk_data_sqlite()
-        seed_test_alerts_sqlite()
-        seed_demo_detections()
+            seed_test_alerts_sqlite()
     else:
         if args.risk:
             if SQLALCHEMY_AVAILABLE:
@@ -461,7 +545,10 @@ def main():
         if args.init:
             init_risk_data_sqlite()
         if args.alerts:
-            seed_test_alerts_sqlite()
+            if SQLALCHEMY_AVAILABLE:
+                seed_test_alerts_sqlalchemy()
+            else:
+                seed_test_alerts_sqlite()
         if args.demo:
             seed_demo_detections()
 
