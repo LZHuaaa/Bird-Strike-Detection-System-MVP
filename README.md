@@ -118,10 +118,10 @@ Special monitoring for Malaysian airport high-risk species:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.  
-git clone https://github.com/LZHuaaa/AI-Bird-Strike-Detection-System.git
+git clone https://github.com/LZHuaaa/Bird-Strike-Detection-System-MVP.git
 
 # Step 2: Navigate to the project directory.  
-cd AI-Bird-Strike-Detection-System
+cd Bird-Strike-Detection-System-MVP
 
 # Step 3: Install frontend dependencies.  
 npm install
